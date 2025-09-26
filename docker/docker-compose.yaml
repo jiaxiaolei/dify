@@ -1172,8 +1172,8 @@ services:
     networks:
       - milvus
 
-  milvus-standalone:
-    container_name: milvus-standalone
+  milvus-standalone-jia:
+    container_name: milvus-standalone-jia
     image: milvusdb/milvus:v2.5.15
     profiles:
       - milvus
@@ -1181,7 +1181,9 @@ services:
     environment:
       ETCD_ENDPOINTS: ${ETCD_ENDPOINTS:-etcd:2379}
       MINIO_ADDRESS: ${MINIO_ADDRESS:-minio:9000}
-      common.security.authorizationEnabled: ${MILVUS_AUTHORIZATION_ENABLED:-true}
+      common.security.authorizationEnabled: ${MILVUS_AUTHORIZATION_ENABLED:-false}
+      ROOT_NAME: ""
+      ROOT_PASSWORD: ""
     volumes:
       - ./volumes/milvus/milvus:/var/lib/milvus
     healthcheck:
@@ -1194,8 +1196,8 @@ services:
       - etcd
       - minio
     ports:
-      - 19530:19530
-      - 9091:9091
+      - 29530:19530
+      - 29091:9091
     networks:
       - milvus
 
