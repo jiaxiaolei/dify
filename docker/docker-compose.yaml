@@ -1145,7 +1145,8 @@ services:
 
   # Milvus vector database services
   etcd:
-    container_name: milvus-etcd
+    #container_name: milvus-etcd
+    container_name: dify-milvus-etcd
     image: quay.io/coreos/etcd:v3.5.5
     profiles:
       - milvus
@@ -1166,7 +1167,8 @@ services:
       - milvus
 
   minio:
-    container_name: milvus-minio
+    #container_name: milvus-minio
+    container_name: dify-milvus-minio
     image: minio/minio:RELEASE.2023-03-20T20-16-18Z
     profiles:
       - milvus
@@ -1184,7 +1186,7 @@ services:
     networks:
       - milvus
 
-  milvus-standalone-jia:
+  milvus-standalone:
     container_name: milvus-standalone-jia
     image: milvusdb/milvus:v2.5.15
     profiles:
