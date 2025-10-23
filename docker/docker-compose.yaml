@@ -713,6 +713,9 @@ services:
   db:
     image: postgres:15-alpine
     restart: always
+    #jia: 把端口映射到宿主机上，可以远程连接
+    ports:
+      - "25432:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-difyai123456}
