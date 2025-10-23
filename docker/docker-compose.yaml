@@ -474,7 +474,7 @@ x-shared-env: &shared-api-worker-env
   MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
   ETCD_ENDPOINTS: ${ETCD_ENDPOINTS:-etcd:2379}
   MINIO_ADDRESS: ${MINIO_ADDRESS:-minio:9000}
-  MILVUS_AUTHORIZATION_ENABLED: ${MILVUS_AUTHORIZATION_ENABLED:-true}
+  MILVUS_AUTHORIZATION_ENABLED: false # ${MILVUS_AUTHORIZATION_ENABLED:-true}
   PGVECTOR_PGUSER: ${PGVECTOR_PGUSER:-postgres}
   PGVECTOR_POSTGRES_PASSWORD: ${PGVECTOR_POSTGRES_PASSWORD:-difyai123456}
   PGVECTOR_POSTGRES_DB: ${PGVECTOR_POSTGRES_DB:-dify}
@@ -941,6 +941,10 @@ services:
   # The Weaviate vector store.
   weaviate:
     image: semitechnologies/weaviate:1.27.0
+    #NOTE: jiaxiaolei add port to debug
+    ports:
+        - "28080:8080"
+        - "28081:8081"
     profiles:
       - weaviate
     restart: always
@@ -1188,16 +1192,16 @@ services:
 
   milvus-standalone:
     container_name: milvus-standalone-jia
-    image: milvusdb/milvus:v2.5.15
+    #image: milvusdb/milvus:v2.5.15
+    # jia: new version
+    image: milvusdb/milvus:v2.6.2
     profiles:
       - milvus
     command: ["milvus", "run", "standalone"]
     environment:
       ETCD_ENDPOINTS: ${ETCD_ENDPOINTS:-etcd:2379}
       MINIO_ADDRESS: ${MINIO_ADDRESS:-minio:9000}
-      common.security.authorizationEnabled: ${MILVUS_AUTHORIZATION_ENABLED:-false}
-      ROOT_NAME: ""
-      ROOT_PASSWORD: ""
+      common.security.authorizationEnabled: false  #${MILVUS_AUTHORIZATION_ENABLED:-false}
     volumes:
       - ./volumes/milvus/milvus:/var/lib/milvus
     healthcheck:
