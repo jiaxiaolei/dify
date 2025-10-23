@@ -1,7 +1,7 @@
 import type { MouseEvent } from 'react'
 import { useCallback, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import produce from 'immer'
+import { produce } from 'immer'
 import type {
   NodeDragHandler,
   NodeMouseHandler,
@@ -16,7 +16,7 @@ import {
   useReactFlow,
   useStoreApi,
 } from 'reactflow'
-import type { ToolDefaultValue } from '../block-selector/types'
+import type { DataSourceDefaultValue, ToolDefaultValue } from '../block-selector/types'
 import type { Edge, Node, OnNodeAdd } from '../types'
 import { BlockEnum } from '../types'
 import { useWorkflowStore } from '../store'
@@ -70,7 +70,7 @@ export const useNodesInteractions = () => {
   const reactflow = useReactFlow()
   const { store: workflowHistoryStore } = useWorkflowHistoryStore()
   const { handleSyncWorkflowDraft } = useNodesSyncDraft()
-  const { checkNestedParallelLimit, getAfterNodesInSameBranch } = useWorkflow()
+  const { getAfterNodesInSameBranch } = useWorkflow()
   const { getNodesReadOnly } = useNodesReadOnly()
   const { getWorkflowReadOnly } = useWorkflowReadOnly()
   const { handleSetHelpline } = useHelpline()
@@ -436,21 +436,13 @@ export const useNodesInteractions = () => {
         draft.push(newEdge)
       })
 
-      if (checkNestedParallelLimit(newNodes, newEdges, targetNode)) {
-        setNodes(newNodes)
-        setEdges(newEdges)
+      setNodes(newNodes)
+      setEdges(newEdges)
 
-        handleSyncWorkflowDraft()
-        saveStateToHistory(WorkflowHistoryEvent.NodeConnect, {
-          nodeId: targetNode?.id,
-        })
-      }
-      else {
-        const { setConnectingNodePayload, setEnteringNodePayload }
-          = workflowStore.getState()
-        setConnectingNodePayload(undefined)
-        setEnteringNodePayload(undefined)
-      }
+      handleSyncWorkflowDraft()
+      saveStateToHistory(WorkflowHistoryEvent.NodeConnect, {
+        nodeId: targetNode?.id,
+      })
     },
     [
       getNodesReadOnly,
@@ -458,7 +450,6 @@ export const useNodesInteractions = () => {
       workflowStore,
       handleSyncWorkflowDraft,
       saveStateToHistory,
-      checkNestedParallelLimit,
     ],
   )
 
@@ -934,13 +925,8 @@ export const useNodesInteractions = () => {
           if (newEdge) draft.push(newEdge)
         })
 
-        if (checkNestedParallelLimit(newNodes, newEdges, prevNode)) {
-          setNodes(newNodes)
-          setEdges(newEdges)
-        }
-        else {
-          return false
-        }
+        setNodes(newNodes)
+        setEdges(newEdges)
       }
       if (!prevNodeId && nextNodeId) {
         const nextNodeIndex = nodes.findIndex(node => node.id === nextNodeId)
@@ -1087,17 +1073,11 @@ export const useNodesInteractions = () => {
             draft.push(newEdge)
           })
 
-          if (checkNestedParallelLimit(newNodes, newEdges, nextNode)) {
-            setNodes(newNodes)
-            setEdges(newEdges)
-          }
-          else {
-            return false
-          }
+          setNodes(newNodes)
+          setEdges(newEdges)
         }
         else {
-          if (checkNestedParallelLimit(newNodes, edges)) setNodes(newNodes)
-          else return false
+          setNodes(newNodes)
         }
       }
       if (prevNodeId && nextNodeId) {
@@ -1297,7 +1277,6 @@ export const useNodesInteractions = () => {
       saveStateToHistory,
       workflowStore,
       getAfterNodesInSameBranch,
-      checkNestedParallelLimit,
       nodesMetaDataMap,
     ],
   )
@@ -1307,7 +1286,7 @@ export const useNodesInteractions = () => {
       currentNodeId: string,
       nodeType: BlockEnum,
       sourceHandle: string,
-      toolDefaultValue?: ToolDefaultValue,
+      toolDefaultValue?: ToolDefaultValue | DataSourceDefaultValue,
     ) => {
       if (getNodesReadOnly()) return
 
