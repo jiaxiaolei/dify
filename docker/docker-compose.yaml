@@ -1169,6 +1169,8 @@ services:
       retries: 3
     networks:
       - milvus
+      # NOTE: docker compose -p dify  已经做了区分，不需要再定义dify-milvus进行区分
+      #- dify-milvus
 
   minio:
     #container_name: milvus-minio
@@ -1176,6 +1178,7 @@ services:
     image: minio/minio:RELEASE.2023-03-20T20-16-18Z
     profiles:
       - milvus
+      #- dify-milvus
     environment:
       MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
       MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
@@ -1189,14 +1192,20 @@ services:
       retries: 3
     networks:
       - milvus
+      #- dify-milvus
 
+  #服务名，建议不要修改
+  #dify-milvus-standalone:
   milvus-standalone:
-    container_name: milvus-standalone-jia
+    container_name: dify-milvus-standalone
     #image: milvusdb/milvus:v2.5.15
+    #image: milvusdb/milvus:v2.5.11
     # jia: new version
-    image: milvusdb/milvus:v2.6.2
+    #image: milvusdb/milvus:v2.6.2
+    image: milvusdb/milvus:v2.6.4
     profiles:
       - milvus
+      #- dify-milvus
     command: ["milvus", "run", "standalone"]
     environment:
       ETCD_ENDPOINTS: ${ETCD_ENDPOINTS:-etcd:2379}
@@ -1211,13 +1220,17 @@ services:
       timeout: 20s
       retries: 3
     depends_on:
-      - etcd
-      - minio
+      etcd:
+        #NOTE: add  condition
+        condition: service_healthy 
+      minio:
+        condition: service_healthy
     ports:
       - 29530:19530
       - 29091:9091
     networks:
       - milvus
+      #- dify-milvus
 
   # Opensearch vector database
   opensearch:
@@ -1386,6 +1399,9 @@ networks:
     internal: true
   milvus:
     driver: bridge
+  #NO used
+  #dify-milvus:
+  #  driver: bridge
   opensearch-net:
     driver: bridge
     internal: true
